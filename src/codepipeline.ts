@@ -1,6 +1,6 @@
 import * as aws_sdk from 'aws-sdk'
 
-export function pipelinestatus(pipelineName: string, accessKeyId: string, secretAccessKey: string): object {
+export function pipelinestatus(pipelineName: string, accessKeyId: string, secretAccessKey: string): void {
     const params = {
         name: 'STRING_VALUE', 
         version: 'NUMBER_VALUE'
@@ -19,8 +19,9 @@ export function pipelinestatus(pipelineName: string, accessKeyId: string, secret
     
     const pipelineDetails = codePipeline.getPipeline({
         name: pipelineName,
+    }, function(err, data){
+        if (err) console.log(err, err.stack)
+        else console.log(data)
     })
-
-    return pipelineDetails
 }
   

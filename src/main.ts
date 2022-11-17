@@ -13,8 +13,7 @@ function run(): void {
     core.debug(new Date().toTimeString())
     wait(parseInt(ms, 10))
     core.debug(new Date().toTimeString())
-    console.log(accessKeyId)
-    console.log(pipelinestatus(pipelineName, accessKeyId, secretAccessKey))
+    pipelinestatus(pipelineName, accessKeyId, secretAccessKey)
 
     core.setOutput('time', new Date().toTimeString())
   } catch (error) {
