@@ -24,7 +24,7 @@ export function pipelinestatus(pipelineName: string, accessKeyId: string, secret
 
     codePipeline.getPipelineState(params, function(err, data){
         if (err) console.log(err, err.stack)
-        else console.log(`Pipeline state: ${data}`)
+        else console.log(`Pipeline state: ${data.stageStates?.at(0)?.stageName}`)
     })
 }
   
