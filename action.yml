@@ -1,11 +1,11 @@
-name: 'Your name here'
-description: 'Provide a description here'
-author: 'Your name or organization here'
+name: 'CodePipeline status'
+description: 'Provide the status of CodePipeline'
+author: 'Leonardo R.'
 inputs:
   milliseconds: # change this
-    required: true
-    description: 'input description here'
-    default: 'default value if applicable'
+    required: false
+    description: 'sample input: miliseconds'
+    default: '2000'
 runs:
   using: 'node16'
   main: 'dist/index.js'
