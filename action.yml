@@ -6,6 +6,15 @@ inputs:
     required: false
     description: 'sample input: miliseconds'
     default: '2000'
+  pipelineName:
+    required: true
+    description: 'Pipeline Name'
+  accessKeyId:
+    required: true
+    description: 'AWS Access Key ID'
+  secretAccessKey:
+    required: true
+    description: 'AWS Access Secret Key'
 runs:
   using: 'node16'
   main: 'dist/index.js'
