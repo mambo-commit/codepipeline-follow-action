@@ -36,6 +36,7 @@ export function pipelinestatus(pipelineName: string, accessKeyId: string, secret
     }, function(err, data){
         if (err) console.log(err, err.stack)
     }).on('success', function(response){
+        console.log(response.data)
         pipelineExecutions = response.data
     })
 
