@@ -1,6 +1,6 @@
 import * as core from '@actions/core'
 import {wait} from './wait'
-import {pipelinestatus} from './codepipeline'
+import {bucketVersion} from './codepipeline'
 
 function run(): void {
   try {
@@ -15,7 +15,9 @@ function run(): void {
     core.debug(new Date().toTimeString())
     wait(parseInt(ms, 10))
     core.debug(new Date().toTimeString())
-    pipelinestatus(pipelineName, accessKeyId, secretAccessKey, bucketName, artifactName )
+    bucketVersion(accessKeyId, secretAccessKey, bucketName, artifactName)
+    //pipelinestatus(pipelineName, accessKeyId, secretAccessKey, bucketName, artifactName )
+
 
     core.setOutput('time', new Date().toTimeString())
   } catch (error) {
