@@ -27,20 +27,24 @@ export function pipelinestatus(pipelineName: string, accessKeyId: string, secret
     //     if (err) console.log(err, err.stack)
     //     else console.log(`Pipeline state: ${data.stageStates?.at(0)?.stageName}`)
     // })
-
+    
+    let pipelineExecutions
+    
     codePipeline.listPipelineExecutions({
         pipelineName,
         maxResults: 1
     }, function(err, data){
         if (err) console.log(err, err.stack)
-        else { 
-            console.log(`Pipeline Execution ID: ${data.pipelineExecutionSummaries?.at(0)?.pipelineExecutionId}`)
-            console.log(`Pipeline SourceRevisions  ID: ${data.pipelineExecutionSummaries?.at(0)?.sourceRevisions?.at(0)?.revisionId}`)
-            console.log(`Pipeline Execution StartTime: ${data.pipelineExecutionSummaries?.at(0)?.startTime}`)
-            console.log(`Pipeline Execution Status: ${data.pipelineExecutionSummaries?.at(0)?.status}`)
-        }
+    }).on('success', function(response){
+        pipelineExecutions = response.data
     })
 
+    console.log(pipelineExecutions)
+    
+    // console.log(`Pipeline Execution ID: ${data.pipelineExecutionSummaries?.at(0)?.pipelineExecutionId}`)
+    // console.log(`Pipeline SourceRevisions  ID: ${data.pipelineExecutionSummaries?.at(0)?.sourceRevisions?.at(0)?.revisionId}`)
+    // console.log(`Pipeline Execution StartTime: ${data.pipelineExecutionSummaries?.at(0)?.startTime}`)
+    // console.log(`Pipeline Execution Status: ${data.pipelineExecutionSummaries?.at(0)?.status}`)
     
 }
   
