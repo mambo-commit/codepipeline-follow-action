@@ -39,11 +39,10 @@ export function pipelinestatus(
   //     else console.log(`Pipeline state: ${data.stageStates?.at(0)?.stageName}`)
   // })
 
-  
-  artifactObject.getObjectAttributes({
+  artifactObject.listObjectVersions({
     Bucket: bucketName,
-    Key: artifactName,
-    ObjectAttributes: []
+    Prefix: artifactName,
+    MaxKeys: 1
   },
   function(err) {
     if (err) console.log(err, err.stack)
