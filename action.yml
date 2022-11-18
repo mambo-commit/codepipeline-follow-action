@@ -9,6 +9,12 @@ inputs:
   pipelineName:
     required: true
     description: 'Pipeline Name'
+  bucketName:
+    required: true
+    description: 'Sources bucket Name'
+  artifactName:
+    required: true
+    description: 'Published artifact Name'
   accessKeyId:
     required: true
     description: 'AWS Access Key ID'
