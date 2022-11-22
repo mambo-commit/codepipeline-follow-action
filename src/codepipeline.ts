@@ -30,7 +30,7 @@ export function bucketVersion(
   }
 
   const workFlow = async function () {
-    let timeOut = 3
+    let timeOut = 10
     let ms = 5000
     do {
       if (await excutionRevisionCheck(credentials, bucketName, artifactName)) {
@@ -44,6 +44,7 @@ export function bucketVersion(
       }
       await wait(ms)
       timeOut -= 1
+      console.log(`Retry attempts left: ${timeOut}`)
     } while (timeOut > 0)
   }
 
@@ -81,10 +82,7 @@ async function excutionRevisionCheck(
     data =>
       data.pipelineExecutionSummaries?.at(0)?.sourceRevisions?.at(0)?.revisionId
   )
-  if (versionId == revisionId) {
-    console.log(versionId, revisionId)
-    return true
-  } 
+  if (versionId == revisionId) return true
   else return false
 }
 
