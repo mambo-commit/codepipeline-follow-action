@@ -12,26 +12,9 @@ export function bucketVersion(
     secretAccessKey
   })
 
-  let params
-  params = {
-    apiVersion: 'latest',
-    region: 'us-east-1',
-    credentials
-  }
-
-  const s3Client = new aws_sdk.S3(params)
-
-  const codePipeline = new aws_sdk.CodePipeline(params)
-
-  params = {
-    Bucket: bucketName,
-    Prefix: artifactName,
-    MaxKeys: 1
-  }
-
   const workFlow = async function () {
-    let timeOut = 10
-    let ms = 5000
+    let timeOut = 20
+    let ms = 6000
     do {
       if (await excutionRevisionCheck(credentials, bucketName, artifactName)) {
         console.log('Pipeline execution found!')
