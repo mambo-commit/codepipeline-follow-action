@@ -14,18 +14,17 @@ export function bucketVersion(
 
   const workFlow = async function () {
     let timeOut = 20
-    let ms = 6000
+    let ms = 1000
     do {
       if (await excutionRevisionCheck(credentials, bucketName, artifactName)) {
         console.log('Pipeline execution found!')
-        do {
-          //console.log(`Pipeline current status: ${await getStatus()}`)
-          await wait(2000*25)
-        } while (await isRunning(credentials))
+        while(await isRunning(credentials)) {
+          await wait(ms*60)
+        } 
         console.log('Pipeline execution status check done')
         break
       }
-      await wait(ms)
+      await wait(ms*30)
       timeOut -= 1
       console.log(`Retry attempts left: ${timeOut}`)
     } while (timeOut > 0)
@@ -83,11 +82,19 @@ async function isRunning(credentials: aws_sdk.Credentials) {
     maxResults: 1
   }
   let pipelineExecutions = codePipeline.listPipelineExecutions(params).promise()
+  
   let executionStatus =
     (await pipelineExecutions.then(
       data => data.pipelineExecutionSummaries?.at(0)?.status
     )) || 'noresponse'
   let executionDetails = await pipelineExecutions.then(data => data)
+  
+  params = {
+    pipelineName: 'cicd-test',
+    pipelineExecutionId: executionDetails.pipelineExecutionSummaries?.at(0)?.pipelineExecutionId || 'noid' 
+  }
+  let getPipelineExecution = codePipeline.getPipelineExecution(params).promise()
+  let pipelineExecutioDetails = await getPipelineExecution.then(data => data)
   let stopState = [
     'Succeeded',
     'Stopped',
@@ -98,8 +105,10 @@ async function isRunning(credentials: aws_sdk.Credentials) {
   ]
   let isRunning = true
   console.log(
-    executionStatus,
-    executionDetails.pipelineExecutionSummaries?.at(0)?.lastUpdateTime
+    pipelineExecutioDetails.pipelineExecution?.pipelineName,
+    pipelineExecutioDetails.pipelineExecution?.pipelineExecutionId,
+    pipelineExecutioDetails.pipelineExecution?.status,
+    pipelineExecutioDetails.pipelineExecution?.statusSummary
   )
   if (stopState.includes(executionStatus)) isRunning = false
   return isRunning
