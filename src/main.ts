@@ -9,7 +9,11 @@ function run(): void {
     const secretAccessKey: string = core.getInput('secretAccessKey')
     console.log(`Waiting for pipeline execution ...`)
     
-    bucketVersion(accessKeyId, secretAccessKey, bucketName, artifactName )
+    const process = async () => {
+      await bucketVersion(accessKeyId, secretAccessKey, bucketName, artifactName )
+    }
+
+    process()
 
     //core.setOutput('time', new Date().toTimeString())
   } catch (error) {
