@@ -1,4 +1,5 @@
 import * as aws_sdk from 'aws-sdk'
+import { wait } from './wait'
 
 export function bucketVersion(
   accessKeyId: string,
@@ -33,30 +34,48 @@ export function bucketVersion(
     pipelineName: 'cicd-test',
     maxResults: 1
   }
-  let pipelineExecution = codePipeline.listPipelineExecutions(params).promise()
+  let pipelineExecutions = codePipeline.listPipelineExecutions(params).promise();
 
-  objectID
-    .then(data => data)
-    .then(object => {
-      pipelineExecution
-        .then(function (data) {
-            let versionId = object.Versions?.at(0)?.VersionId
-            let revisionId = data.pipelineExecutionSummaries?.at(0)?.sourceRevisions?.at(0)?.revisionId
-            let actionName = data.pipelineExecutionSummaries?.at(0)?.sourceRevisions?.at(0)?.actionName
-            if (versionId == revisionId) {
-                console.log('Pipeline execution matches published artifact revision')
-                let executionStatus = data.pipelineExecutionSummaries?.at(0)?.status
-                console.log(`Status: ${executionStatus}`)
-                // console.log(`Action Name: ${actionName}`)
-                // console.log(`Revision ID: ${revisionId}`)
-                // console.log(`Published object version ID: ${versionId}`)
-            }
-        })
-        .catch(function (err) {
-          console.log('error', err)
-        })
-    })
-    .catch(function (err) {
-      console.log('error', err)
-    })
+  const excutionRevisionCheck = async function () {
+    let versionId = await objectID.then(data => data.Versions?.at(0)?.VersionId)
+    let revisionId = await pipelineExecutions.then(data => data.pipelineExecutionSummaries?.at(0)?.sourceRevisions?.at(0)?.revisionId)
+    if (versionId == revisionId)
+        return true 
+    else
+        return false
+  }
+
+  const getStatus = async function () {
+    return await pipelineExecutions.then(data => data.pipelineExecutionSummaries?.at(0)?.status) || 'noresponse'
+  }
+
+  const isRunning = async function () {
+    let executionStatus = await pipelineExecutions.then(data => data.pipelineExecutionSummaries?.at(0)?.status) || 'noresponse'
+    let stopState = ['Succeeded', 'Stopped', 'Cancelled', 'Superseded', 'Failed']
+    let isRunning = true
+    if (stopState.includes(executionStatus))
+        isRunning = false
+    return isRunning
+  }
+
+  const workFlow = async function () {
+    let timeOut = 3
+    let ms = 5000
+    do {
+        await wait(ms)
+        if (await excutionRevisionCheck()){  
+            let status
+            do {
+                status = await getStatus()   
+                console.log(`Pipeline current status: ${status}`)
+                await wait(3000)
+            } while (await isRunning());
+            break
+        }
+        timeOut -= 1
+    }while(timeOut > 0)
+  }
+
+  workFlow()
+
 }
