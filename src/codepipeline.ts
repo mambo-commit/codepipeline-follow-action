@@ -18,65 +18,45 @@ export function bucketVersion(
     credentials
   }
 
-  const artifactObject = new aws_sdk.S3(params)
-  // Get object revision
-  const versions = async () => {
-    await artifactObject.listObjectVersions(
-        {
-        Bucket: bucketName,
-        Prefix: artifactName,
-        MaxKeys: 1
-        },
-        function (err, data) {
-        if (err) console.log(err, err.stack)
-        else console.log(data)
-        }
-    ).promise().then((response) => {return response})
+  const s3Client = new aws_sdk.S3(params)
+
+  const codePipeline = new aws_sdk.CodePipeline(params)
+
+  params = {
+    Bucket: bucketName,
+    Prefix: artifactName,
+    MaxKeys: 1
   }
+  let objectID = s3Client.listObjectVersions(params).promise()
 
-  console.log(versions)
+  params = {
+    pipelineName: 'cicd-test',
+    maxResults: 1
+  }
+  let pipelineExecution = codePipeline.listPipelineExecutions(params).promise()
+
+  objectID
+    .then(data => data)
+    .then(object => {
+      pipelineExecution
+        .then(function (data) {
+            let versionId = object.Versions?.at(0)?.VersionId
+            let revisionId = data.pipelineExecutionSummaries?.at(0)?.sourceRevisions?.at(0)?.revisionId
+            let actionName = data.pipelineExecutionSummaries?.at(0)?.sourceRevisions?.at(0)?.actionName
+            if (versionId == revisionId) {
+                console.log('Pipeline execution matches published artifact revision')
+                let executionStatus = data.pipelineExecutionSummaries?.at(0)?.status
+                console.log(`Status: ${executionStatus}`)
+                // console.log(`Action Name: ${actionName}`)
+                // console.log(`Revision ID: ${revisionId}`)
+                // console.log(`Published object version ID: ${versionId}`)
+            }
+        })
+        .catch(function (err) {
+          console.log('error', err)
+        })
+    })
+    .catch(function (err) {
+      console.log('error', err)
+    })
 }
-
-// export  function pipelinestatus(
-//     pipelineName: string,
-//     accessKeyId: string,
-//     secretAccessKey: string,
-//   ): void {
-//     const credentials = new aws_sdk.Credentials({
-//       accessKeyId,
-//       secretAccessKey
-//     })
-  
-//     let params
-//     params = {
-//       apiVersion: 'latest',
-//       region: 'us-east-1',
-//       credentials
-//     }
-  
-//     const codePipeline = new aws_sdk.CodePipeline(params)
-  
-//     const artifactObject = new aws_sdk.S3(params)
-  
-//     params = {
-//       name: pipelineName
-//     }
-  
-//     console.log(`Pipeline name: ${pipelineName}`)
-//     codePipeline.getPipeline(params, function (err, data) {
-//       if (err) console.log(err, err.stack)
-//       else console.log(`Pipeline ARN: ${data.metadata?.pipelineArn}`)
-//     }) 
-    
-//     // Get pipeline execution details
-//     codePipeline.listPipelineExecutions(
-//       {
-//         pipelineName,
-//         maxResults: 1
-//       },
-//       function (err, data) {
-//         if (err) console.log(err, err.stack)
-//       }
-//     )
-//   }
-// }

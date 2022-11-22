@@ -4,18 +4,21 @@ import {bucketVersion} from './codepipeline'
 
 function run(): void {
   try {
-    const ms: string = core.getInput('milliseconds')
     const pipelineName: string = core.getInput('pipelineName')
     const bucketName: string = core.getInput('bucketName')
     const artifactName: string = core.getInput('artifactName')
     const accessKeyId: string = core.getInput('accessKeyId')
     const secretAccessKey: string = core.getInput('secretAccessKey')
-    console.log(`Waiting ${ms} milliseconds ...`) // debug is only output if you set the secret `ACTIONS_STEP_DEBUG` to true
-
-    core.debug(new Date().toTimeString())
-    wait(parseInt(ms, 10))
-    core.debug(new Date().toTimeString())
-    bucketVersion(accessKeyId, secretAccessKey, bucketName, artifactName)
+    console.log(`Waiting for pipeline execution ...`)
+    let timeout = 5
+    do {
+      wait(parseInt('5000', 10))
+      bucketVersion(accessKeyId, secretAccessKey, bucketName, artifactName)
+      timeout -= 1
+    } while (timeout > 0)
+    // core.debug(new Date().toTimeString())
+    // core.debug(new Date().toTimeString())
+    
     //pipelinestatus(pipelineName, accessKeyId, secretAccessKey, bucketName, artifactName )
 
 
