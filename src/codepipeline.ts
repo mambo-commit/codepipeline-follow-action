@@ -20,7 +20,7 @@ export function bucketVersion(
         console.log('Pipeline execution found!')
         do {
           //console.log(`Pipeline current status: ${await getStatus()}`)
-          await wait(2000)
+          await wait(2000*25)
         } while (await isRunning(credentials))
         console.log('Pipeline execution status check done')
         break
